@@ -317,7 +317,7 @@ void AssimpLoader::Render3DModel(glm::mat4 *mvpMat) {
 
         int x = modelMeshes[n].numberOfFaces * 3;
 
-        //glDrawArrays(GL_TRIANGLE_STRIP, 0, x *2);
+       // glDrawArrays(GL_TRIANGLE_STRIP, 0, x);
         glDrawElements(GL_TRIANGLE_STRIP, x, GL_UNSIGNED_INT, 0);//GL_LINE_LOOP
         // unbind buffers
         glBindBuffer(GL_ARRAY_BUFFER, 0);
