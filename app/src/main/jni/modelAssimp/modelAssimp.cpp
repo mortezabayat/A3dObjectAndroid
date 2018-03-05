@@ -7,13 +7,17 @@
  * Class constructor
  */
 ModelAssimp::ModelAssimp() {
+
+    MyLOGD("ModelAssimp::ModelAssimp");
     initsDone = false;
+
     // create MyGLCamera object and set default position for the object
     myGLCamera = new MyGLCamera();
     float pos[] = {0., 0., 0., 0.2, 0.5, 0.};
     std::copy(&pos[0], &pos[5], std::back_inserter(modelDefaultPosition));
     myGLCamera->SetModelPosition(modelDefaultPosition);
 
+    modelObject = NULL;
 }
 
 ModelAssimp::~ModelAssimp() {
@@ -30,6 +34,7 @@ ModelAssimp::~ModelAssimp() {
  * Perform inits and load the triangle's vertices/colors to GLES
  */
 void ModelAssimp::PerformGLInits() {
+
 
     MyLOGD("ModelAssimp::PerformGLInits");
 
@@ -48,15 +53,16 @@ void ModelAssimp::PerformGLInits() {
         return;
     }
 
-   // myfileReader = new MyfileReader();
-    //myfileReader->load_obj("amenemhat/cube1.obj", objFilename, mesh);
-
-   // mesh->object2world = glm::mat4(1);
-   // this->MyRender(mesh);
     modelObject->Load3DModel(objFilename);
 
     CheckGLError("ModelAssimp::PerformGLInits");
     initsDone = true;
+
+    // myfileReader = new MyfileReader();
+    //myfileReader->load_obj("amenemhat/cube.obj", objFilename, mesh);
+
+    // mesh->object2world = glm::mat4(1);
+    // this->MyRender(mesh);
 }
 
 void ModelAssimp::MyRender(MyMesh *mesh) {
@@ -68,13 +74,12 @@ void ModelAssimp::MyRender(MyMesh *mesh) {
  * Render to the display
  */
 void ModelAssimp::Render() {
-
     // clear the screen
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-    if (mesh == NULL)
-        mesh = new MyMesh();
+
     glm::mat4 mvpMat = myGLCamera->GetMVP();
-    modelObject->Render3DModel( &mvpMat);
+    modelObject->Render3DModel(&mvpMat);
+
     CheckGLError("ModelAssimp::Render");
 }
 
@@ -82,11 +87,11 @@ void ModelAssimp::Render() {
  * set the viewport, function is also called when user changes device orientation
  */
 void ModelAssimp::SetViewport(int width, int height) {
-
     screenHeight = height;
     screenWidth = width;
     glViewport(0, 0, width, height);
     CheckGLError("Cube::SetViewport");
+
     myGLCamera->SetAspectRatio((float) width / height);
 }
 

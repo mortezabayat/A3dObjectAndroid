@@ -74,7 +74,7 @@ bool CompileShader(GLuint & shaderID, const GLenum shaderType, std::string shade
         MyLOGI("Failed to compile shader");
         std::vector<char> shaderErrorMessage(infoLogLength + 1);
         glGetShaderInfoLog(shaderID, infoLogLength, NULL, &shaderErrorMessage[0]);
-        MyLOGI(" myShader %s -> %s",shaderCode.c_str(), &shaderErrorMessage[0]);
+        MyLOGI("%s", &shaderErrorMessage[0]);
         return false;
     }
     else{
@@ -89,8 +89,7 @@ bool CompileShader(GLuint & shaderID, const GLenum shaderType, std::string shade
  */
 bool LinkProgram(GLuint programID, GLuint vertexShaderID,
                  GLuint fragmentShaderID) {
-    GLint result = GL_FALSE;GLint validate_ok = GL_FALSE;
-
+    GLint result = GL_FALSE;
     int infoLogLength;
 
     MyLOGI("Linking program");
@@ -101,9 +100,6 @@ bool LinkProgram(GLuint programID, GLuint vertexShaderID,
 
     // Check the program
     glGetProgramiv(programID, GL_LINK_STATUS, &result);
-    glValidateProgram(programID);
-    glGetProgramiv(programID, GL_VALIDATE_STATUS, &validate_ok);
-
     glGetProgramiv(programID, GL_INFO_LOG_LENGTH, &infoLogLength);
 
     // common deletes
@@ -170,42 +166,6 @@ GLuint LoadShaders(std::string vertexShaderFilename,
     return programID;
 }
 
-GLuint LoadShaders(std::string vertexShaderFilename,
-                   std::string fragmentShaderFilename ,GLuint *vertexShaderID ,GLuint *fragmentShaderID) {
-
-    GLuint  programID;
-    programID = glCreateProgram();
-
-    // read and compile the vertex shader
-    std::string vertexShaderCode;
-    if (!ReadShaderCode(vertexShaderCode, vertexShaderFilename)) {
-        MyLOGE("Error in reading Vertex shader");
-        return 0;
-    }
-    if (!CompileShader((GLuint &) vertexShaderID, GL_VERTEX_SHADER, vertexShaderCode)) {
-        MyLOGE("Error in compiling Vertex shader");
-        return 0;
-    }
-
-    // read and compile the fragment shader
-    std::string fragmentShaderCode;
-    if (!ReadShaderCode(fragmentShaderCode, fragmentShaderFilename)) {
-        MyLOGE("Error in reading Fragment shader");
-        return 0;
-    }
-    if (!CompileShader((GLuint &) fragmentShaderID, GL_FRAGMENT_SHADER, fragmentShaderCode)) {
-        MyLOGE("Error in compiling fragment shader");
-        return 0;
-    }
-
-    // Link both the shaders together
-    if (!LinkProgram(programID, (GLuint) vertexShaderID, (GLuint) fragmentShaderID)) {
-        MyLOGE("Error in linking shaders");
-        return 0;
-    }
-
-    return programID;
-}
 /*
  * get the attribute location of an input variable in a shader
  */

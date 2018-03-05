@@ -23,12 +23,13 @@ MyJNIHelper::MyJNIHelper(JNIEnv *env, jobject obj, jobject assetManager, jstring
     // get a native instance of the asset manager
     // assetManager is passed from Java and should not be garbage collected!
     apkAssetManager = AAssetManager_fromJava(env, assetManager);
+
     //Save app internal data storage path -- we will extract assets and save here
     const char *cPathToInternalDir;
     cPathToInternalDir = env->GetStringUTFChars(pathToInternalDir, NULL ) ;
     apkInternalPath = std::string(cPathToInternalDir);
     env->ReleaseStringUTFChars(pathToInternalDir, cPathToInternalDir);
-    MyLOGI("helper apkInternalPath: %s", apkInternalPath.c_str());
+
     //mutex for thread safety
     pthread_mutex_init(&threadMutex, NULL );
 }
@@ -51,7 +52,7 @@ bool MyJNIHelper::ExtractAssetReturnFilename(std::string assetName, std::string 
     FILE* file = fopen(filename.c_str(), "rb");
     if (file && checkIfFileIsAvailable) {
 
-        MyLOGI(" helper Found extracted file in assets: %s", filename.c_str());
+        MyLOGI("Found extracted file in assets: %s", filename.c_str());
         fclose(file);
         pthread_mutex_unlock( &threadMutex);
         return true;

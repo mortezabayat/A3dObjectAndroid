@@ -25,6 +25,7 @@
 #include "myGLM.h"
 #include "myGLFunctions.h"
 #include "../myCode/myMesh.h"
+#include "../myCode/ByteBuffer.hpp"
 
 // info used to render a mesh
 
@@ -43,6 +44,8 @@ public:
     void Delete3DModel();
 
     void MyLoad3DModel(MyMesh *mesh, glm::mat4 *mvpMat);
+
+    bb::ByteBuffer byteBuffer;
 
 private:
     void GenerateGLBuffers();
@@ -70,7 +73,7 @@ private:
 };
 struct MeshInfo {
     aiMesh *mesh;
-    GLushort textureIndex;
+    GLshort textureIndex;
     int numberOfFaces;
     int numberOfVertice;
     GLuint faceBuffer;

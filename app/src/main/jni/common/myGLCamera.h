@@ -22,7 +22,7 @@
 #include "misc.h"
 
 // sensitivity coefficients for translating gestures to model's movements
-#define SCALE_TO_Z_TRANSLATION  5
+#define SCALE_TO_Z_TRANSLATION  20
 #define TRANSLATION_TO_ANGLE    5
 #define XY_TRANSLATION_FACTOR   10
 

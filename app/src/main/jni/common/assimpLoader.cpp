@@ -13,11 +13,11 @@ AssimpLoader::AssimpLoader() {
     // shader related setup -- loading, attribute and uniform locations
     std::string vertexShader = "shaders/modelTextured.vsh";
     std::string fragmentShader = "shaders/modelTextured.fsh";
-    shaderProgramID         = LoadShaders(vertexShader, fragmentShader);
-    vertexAttribute         = GetAttributeLocation(shaderProgramID, "vertexPosition");
-    vertexUVAttribute       = GetAttributeLocation(shaderProgramID, "vertexUV");
-    mvpLocation             = GetUniformLocation(shaderProgramID, "mvpMat");
-    textureSamplerLocation  = GetUniformLocation(shaderProgramID, "textureSampler");
+    shaderProgramID = LoadShaders(vertexShader, fragmentShader);
+    vertexAttribute = GetAttributeLocation(shaderProgramID, "vertexPosition");
+    vertexUVAttribute = GetAttributeLocation(shaderProgramID, "vertexUV");
+    mvpLocation = GetUniformLocation(shaderProgramID, "mvpMat");
+    textureSamplerLocation = GetUniformLocation(shaderProgramID, "textureSampler");
 
     /// not used jast sampels !//
 //    attribute_v_coord = GetAttributeLocation(shaderProgramID, "v_coord");
@@ -142,83 +142,6 @@ void AssimpLoader::GenerateGLBuffers() {
  */
 bool AssimpLoader::LoadTexturesToGL(std::string modelFilename) {
 
-    // read names of textures associated with all materials
-    textureNameMap.clear();
-
-    for (unsigned int m = 0; m < scene->mNumMaterials; ++m) {
-
-        int textureIndex = 0;
-        aiString textureFilename;
-        aiReturn isTexturePresent = scene->mMaterials[m]->GetTexture(aiTextureType_DIFFUSE,
-                                                                     textureIndex,
-                                                                     &textureFilename);
-        while (isTexturePresent == AI_SUCCESS) {
-            //fill map with textures, OpenGL image ids set to 0
-            textureNameMap.insert(std::pair<std::string, GLuint>(textureFilename.data, 0));
-
-            // more textures? more than one texture could be associated with a material
-            textureIndex++;
-            isTexturePresent = scene->mMaterials[m]->GetTexture(aiTextureType_DIFFUSE,
-                                                                textureIndex, &textureFilename);
-        }
-    }
-
-    int numTextures = (int) textureNameMap.size();
-    MyLOGI("Total number of textures is %d ", numTextures);
-
-    // create and fill array with texture names in GL
-    GLuint *textureGLNames = new GLuint[numTextures];
-    glGenTextures(numTextures, textureGLNames);
-
-    // Extract the directory part from the file name
-    // will be used to read the texture
-    std::string modelDirectoryName = GetDirectoryName(modelFilename);
-
-    // iterate over the textures, read them using OpenCV, load into GL
-    std::map<std::string, GLushort>::iterator textureIterator = textureNameMap.begin();
-    int i = 0;
-    for (; textureIterator != textureNameMap.end(); ++i, ++textureIterator) {
-
-        std::string textureFilename = (*textureIterator).first;  // get filename
-        std::string textureFullPath = modelDirectoryName + "/" + textureFilename;
-        (*textureIterator).second = textureGLNames[i];      // save texture id for filename in map
-
-        // load the texture using OpenCV
-        MyLOGI("Loading texture %s", textureFullPath.c_str());
-        cv::Mat textureImage = cv::imread(textureFullPath);
-        if (!textureImage.empty()) {
-
-            // opencv reads textures in BGR format, change to RGB for GL
-            cv::cvtColor(textureImage, textureImage, CV_BGR2RGB);
-            // opencv reads image from top-left, while GL expects it from bottom-left
-            // vertically flip the image
-            cv::flip(textureImage, textureImage, 0);
-
-            // bind the texture
-            glBindTexture(GL_TEXTURE_2D, textureGLNames[i]);
-            // specify linear filtering
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-            // load the OpenCV Mat into GLES
-            glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, textureImage.cols,
-                         textureImage.rows, 0, GL_RGB, GL_UNSIGNED_BYTE,
-                         textureImage.data);
-            CheckGLError("AssimpLoader::loadGLTexGen");
-
-        } else {
-
-            MyLOGE("Couldn't load texture %s", textureFilename.c_str());
-
-            //Cleanup and return
-            delete[] textureGLNames;
-            return false;
-
-        }
-    }
-
-    //Cleanup and return
-    delete[] textureGLNames;
-    return true;
 }
 
 /**
@@ -282,23 +205,25 @@ void AssimpLoader::Render3DModel(glm::mat4 *mvpMat) {
     if (!isObjectLoaded) {
         return;
     }
-    glEnable(GL_CULL_FACE);
+
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     glUseProgram(shaderProgramID);
     glUniformMatrix4fv(mvpLocation, 1, GL_FALSE, (const GLfloat *) mvpMat);
 
-    glActiveTexture(GL_TEXTURE0);
+    //glActiveTexture(GL_TEXTURE0);
     glUniform1i(textureSamplerLocation, 0);
 
     unsigned int numberOfLoadedMeshes = modelMeshes.size();
 
     // render all meshes
     for (unsigned int n = 0; n < numberOfLoadedMeshes; ++n) {
-        // Texture
+
+        /*// Texture
         if (modelMeshes[n].textureIndex) {
             glBindTexture(GL_TEXTURE_2D, modelMeshes[n].textureIndex);
-        }
+        }*/
+
         // Faces
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, modelMeshes[n].faceBuffer);
 
@@ -307,18 +232,64 @@ void AssimpLoader::Render3DModel(glm::mat4 *mvpMat) {
         glEnableVertexAttribArray(vertexAttribute);
         glVertexAttribPointer(vertexAttribute, 3, GL_FLOAT, 0, 0, 0);
 
-        /* Use the index data loaded from the Open Asset Importer. */
+        /*// Texture coords
+        glBindBuffer(GL_ARRAY_BUFFER, modelMeshes[n].textureCoordBuffer);
+        glEnableVertexAttribArray(vertexUVAttribute);
+        glVertexAttribPointer(vertexUVAttribute, 2, GL_FLOAT, 0, 0, 0);*/
+
+
+        glDrawElements(GL_TRIANGLES, modelMeshes[n].numberOfFaces * 3, GL_UNSIGNED_INT, 0);//GL_UNSIGNED_SHORT
+
+        // unbind buffers
+        glBindBuffer(GL_ARRAY_BUFFER, 0);
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+
+    }
+
+    CheckGLError("AssimpLoader::renderObject() ");
+
+  /*  // render all meshes
+    for (unsigned int n = 0; n < numberOfLoadedMeshes; ++n) {
+        // Texture
+        if (modelMeshes[n].textureIndex) {
+            glBindTexture(GL_TEXTURE_2D, modelMeshes[n].textureIndex);
+        }
+        // Faces
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, modelMeshes[n].faceBuffer);
+
+
+        // Vertices
+        glBindBuffer(GL_ARRAY_BUFFER, modelMeshes[n].vertexBuffer);
+        glEnableVertexAttribArray(vertexAttribute);
+        glVertexAttribPointer(vertexAttribute, 3, GL_FLOAT, 0, 0, 0);
+
+
+        *//* Use the index data loaded from the Open Asset Importer. *//*
         //glDrawElements(GL_TRIANGLES, scene->mMeshes[n]->mNumFaces, GL_UNSIGNED_BYTE, &indices[n]);
 
         // Texture coords
-        glBindBuffer(GL_ARRAY_BUFFER, modelMeshes[n].textureCoordBuffer);
-        glEnableVertexAttribArray(vertexUVAttribute);
-        glVertexAttribPointer(vertexUVAttribute, 2, GL_FLOAT, 0, 0, 0);
+        // glBindBuffer(GL_ARRAY_BUFFER, modelMeshes[n].textureCoordBuffer);
+        //glEnableVertexAttribArray(vertexUVAttribute);
+        //glVertexAttribPointer(vertexUVAttribute, 2, GL_FLOAT, 0, 0, 0);
 
-        int x = modelMeshes[n].numberOfFaces * 3;
+        int x = modelMeshes[n].numberOfFaces*3;
 
-       // glDrawArrays(GL_TRIANGLE_STRIP, 0, x);
-        glDrawElements(GL_TRIANGLE_STRIP, x, GL_UNSIGNED_INT, 0);//GL_LINE_LOOP
+        *//* if (x == 6)
+             glDrawArrays(GL_TRIANGLE_FAN, 0, x);
+         else glDrawArrays(GL_TRIANGLE_FAN, 0, 6);
+ *//*
+        MyLOGE("numberOfFaces %d", x);
+        MyLOGE("textureIndex %d", modelMeshes[n].textureIndex);
+
+        //for (int i = 0; i < x / 3; ++i)
+       *//* if (x > 3) {
+            for (int i = 0; i < x / 6 - 2; ++i)
+                glDrawArrays(GL_TRIANGLE_FAN, 0, 3);
+        } else
+            glDrawArrays(GL_TRIANGLE_FAN, modelMeshes[n].textureIndex, x);*//*
+        // glDrawArrays(GL_TRIANGLE_FAN, i, 3);
+         glDrawElements(GL_TRIANGLES, x, GL_UNSIGNED_INT, 0);//GL_LINE_LOOP
+
         // unbind buffers
         glBindBuffer(GL_ARRAY_BUFFER, 0);
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
@@ -326,7 +297,8 @@ void AssimpLoader::Render3DModel(glm::mat4 *mvpMat) {
         glDisableVertexAttribArray(vertexUVAttribute);
 
 
-    }
+    }*/
+    // MyLOGE("==================================================");
     CheckGLError("AssimpLoader::renderObject() ");
 }
 

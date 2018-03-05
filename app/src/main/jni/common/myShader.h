@@ -21,7 +21,6 @@
 #include <string>
 
 GLuint LoadShaders(std::string vertexShaderCode, std::string fragmentShaderCode);
-GLuint LoadShaders(std::string vertexShaderCode, std::string fragmentShaderCode ,GLuint *vShaderCode ,GLuint *fShaderCode);
 GLuint GetAttributeLocation(GLuint programID, std::string variableName);
 GLint GetUniformLocation(GLuint programID, std::string uniformName);
 
