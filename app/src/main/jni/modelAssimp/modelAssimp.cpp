@@ -40,9 +40,9 @@ void ModelAssimp::PerformGLInits() {
     // extract the OBJ and companion files from assets // humvee
     std::string objFilename, mtlFilename, texFilename;//cube2
     bool isFilesPresent =
-            gHelperObject->ExtractAssetReturnFilename("amenemhat/cube1.obj", objFilename) &&
-            gHelperObject->ExtractAssetReturnFilename("amenemhat/cube1.obj.mtl", mtlFilename) &&
-            gHelperObject->ExtractAssetReturnFilename("amenemhat/cube.bmp", texFilename);
+            gHelperObject->ExtractAssetReturnFilename("amenemhat/penguin.obj", objFilename) &&
+            gHelperObject->ExtractAssetReturnFilename("amenemhat/penguin.mtl", mtlFilename) &&
+            gHelperObject->ExtractAssetReturnFilename("amenemhat/penguin.bmp", texFilename);
     if (!isFilesPresent) {
         MyLOGE("Model %s does not exist!", objFilename.c_str());
         return;

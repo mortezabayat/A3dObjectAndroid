@@ -13,11 +13,11 @@ AssimpLoader::AssimpLoader() {
     // shader related setup -- loading, attribute and uniform locations
     std::string vertexShader = "shaders/modelTextured.vsh";
     std::string fragmentShader = "shaders/modelTextured.fsh";
-    shaderProgramID = LoadShaders(vertexShader, fragmentShader, vertexShaderID, fragmentShaderID);
-    vertexAttribute = GetAttributeLocation(shaderProgramID, "a_Position");
-    vertexUVAttribute = GetAttributeLocation(shaderProgramID, "vertexUV");
-    mvpLocation = GetUniformLocation(shaderProgramID, "mvpMat");
-    textureSamplerLocation = GetUniformLocation(shaderProgramID, "textureSampler");
+    shaderProgramID         = LoadShaders(vertexShader, fragmentShader);
+    vertexAttribute         = GetAttributeLocation(shaderProgramID, "vertexPosition");
+    vertexUVAttribute       = GetAttributeLocation(shaderProgramID, "vertexUV");
+    mvpLocation             = GetUniformLocation(shaderProgramID, "mvpMat");
+    textureSamplerLocation  = GetUniformLocation(shaderProgramID, "textureSampler");
 
     /// not used jast sampels !//
 //    attribute_v_coord = GetAttributeLocation(shaderProgramID, "v_coord");
@@ -255,14 +255,14 @@ void AssimpLoader::MyLoad3DModel(MyMesh *mesh, glm::mat4 *mvp) {
     glEnable(GL_CULL_FACE);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     //glUseProgram(shaderProgramID);
-    mesh->draw(attribute_v_coord, attribute_v_normal, uniform_m, uniform_m_3x3_inv_transp, mvp);
+    //mesh->draw(attribute_v_coord, attribute_v_normal, uniform_m, uniform_m_3x3_inv_transp, mvp);
 }
 
 /**
  * Clears memory associated with the 3D model
  */
 void AssimpLoader::Delete3DModel() {
-    if (isObjectLoaded) {
+    /*if (isObjectLoaded) {
         // clear modelMeshes stuff
         for (unsigned int i = 0; i < modelMeshes.size(); ++i) {
             // glDeleteTextures(1, &(modelMeshes[i].textureIndex));
@@ -271,7 +271,7 @@ void AssimpLoader::Delete3DModel() {
 
         MyLOGI("Deleted Assimp object");
         isObjectLoaded = false;
-    }
+    }*/
 }
 
 /**
@@ -318,7 +318,7 @@ void AssimpLoader::Render3DModel(glm::mat4 *mvpMat) {
         int x = modelMeshes[n].numberOfFaces * 3;
 
         //glDrawArrays(GL_TRIANGLE_STRIP, 0, x *2);
-        glDrawElements(GL_LINE_LOOP, x, GL_UNSIGNED_INT, 0);//GL_LINE_LOOP
+        glDrawElements(GL_TRIANGLE_STRIP, x, GL_UNSIGNED_INT, 0);//GL_LINE_LOOP
         // unbind buffers
         glBindBuffer(GL_ARRAY_BUFFER, 0);
         glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
