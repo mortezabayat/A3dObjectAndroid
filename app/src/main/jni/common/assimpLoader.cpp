@@ -217,38 +217,8 @@ void AssimpLoader::Render3DModel(glm::mat4 *mvpMat) {
     unsigned int numberOfLoadedMeshes = modelMeshes.size();
 
     // render all meshes
-    for (unsigned int n = 0; n < numberOfLoadedMeshes; ++n) {
 
-        /*// Texture
-        if (modelMeshes[n].textureIndex) {
-            glBindTexture(GL_TEXTURE_2D, modelMeshes[n].textureIndex);
-        }*/
-
-        // Faces
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, modelMeshes[n].faceBuffer);
-
-        // Vertices
-        glBindBuffer(GL_ARRAY_BUFFER, modelMeshes[n].vertexBuffer);
-        glEnableVertexAttribArray(vertexAttribute);
-        glVertexAttribPointer(vertexAttribute, 3, GL_FLOAT, 0, 0, 0);
-
-        /*// Texture coords
-        glBindBuffer(GL_ARRAY_BUFFER, modelMeshes[n].textureCoordBuffer);
-        glEnableVertexAttribArray(vertexUVAttribute);
-        glVertexAttribPointer(vertexUVAttribute, 2, GL_FLOAT, 0, 0, 0);*/
-
-
-        glDrawElements(GL_TRIANGLES, modelMeshes[n].numberOfFaces * 3, GL_UNSIGNED_INT, 0);//GL_UNSIGNED_SHORT
-
-        // unbind buffers
-        glBindBuffer(GL_ARRAY_BUFFER, 0);
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-
-    }
-
-    CheckGLError("AssimpLoader::renderObject() ");
-
-  /*  // render all meshes
+    // render all meshes
     for (unsigned int n = 0; n < numberOfLoadedMeshes; ++n) {
         // Texture
         if (modelMeshes[n].textureIndex) {
@@ -264,7 +234,7 @@ void AssimpLoader::Render3DModel(glm::mat4 *mvpMat) {
         glVertexAttribPointer(vertexAttribute, 3, GL_FLOAT, 0, 0, 0);
 
 
-        *//* Use the index data loaded from the Open Asset Importer. *//*
+        /* Use the index data loaded from the Open Asset Importer. */
         //glDrawElements(GL_TRIANGLES, scene->mMeshes[n]->mNumFaces, GL_UNSIGNED_BYTE, &indices[n]);
 
         // Texture coords
@@ -274,21 +244,21 @@ void AssimpLoader::Render3DModel(glm::mat4 *mvpMat) {
 
         int x = modelMeshes[n].numberOfFaces*3;
 
-        *//* if (x == 6)
+        /* if (x == 6)
              glDrawArrays(GL_TRIANGLE_FAN, 0, x);
-         else glDrawArrays(GL_TRIANGLE_FAN, 0, 6);
- *//*
+         else glDrawArrays(GL_TRIANGLE_FAN, 0, 6);*/
+
         MyLOGE("numberOfFaces %d", x);
         MyLOGE("textureIndex %d", modelMeshes[n].textureIndex);
 
         //for (int i = 0; i < x / 3; ++i)
-       *//* if (x > 3) {
+        if (x > 3) {
             for (int i = 0; i < x / 6 - 2; ++i)
                 glDrawArrays(GL_TRIANGLE_FAN, 0, 3);
         } else
-            glDrawArrays(GL_TRIANGLE_FAN, modelMeshes[n].textureIndex, x);*//*
+            glDrawArrays(GL_TRIANGLE_FAN, modelMeshes[n].textureIndex, x);
         // glDrawArrays(GL_TRIANGLE_FAN, i, 3);
-         glDrawElements(GL_TRIANGLES, x, GL_UNSIGNED_INT, 0);//GL_LINE_LOOP
+        // glDrawElements(GL_TRIANGLES, x, GL_UNSIGNED_INT, 0);//GL_LINE_LOOP
 
         // unbind buffers
         glBindBuffer(GL_ARRAY_BUFFER, 0);
@@ -297,7 +267,7 @@ void AssimpLoader::Render3DModel(glm::mat4 *mvpMat) {
         glDisableVertexAttribArray(vertexUVAttribute);
 
 
-    }*/
+    }
     // MyLOGE("==================================================");
     CheckGLError("AssimpLoader::renderObject() ");
 }
